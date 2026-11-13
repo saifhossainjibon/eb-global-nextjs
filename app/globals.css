@@ -1,0 +1,352 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* `.dark` on <html> (set by next-themes) switches every `dark:` variant */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * EB GLOBAL design system
+ * Light  = cotton-white surfaces, glass, royal gradients
+ * Dark   = black page, midnight-navy glass, light-blue accents
+ */
+@theme inline {
+  --font-latic: var(--font-fraunces), Georgia, serif;
+  --font-display: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-royal: var(--royal);
+  --color-royal-deep: var(--royal-deep);
+  --color-royal-glow: var(--royal-glow);
+  --color-sky-pop: var(--sky-pop);
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
+  --color-cotton: var(--cotton);
+
+  /* body / muted text on page surfaces (flip with the theme): text-t2, text-t3 */
+  --color-t2: var(--t2);
+  --color-t3: var(--t3);
+}
+
+/* ───────────────────────── Light tokens ───────────────────────── */
+:root {
+  --radius: 0.9rem;
+  --background: oklch(0.985 0.008 240);
+  --foreground: oklch(0.22 0.065 265);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.22 0.065 265);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.22 0.065 265);
+  --primary: oklch(0.42 0.14 264);
+  --primary-foreground: oklch(0.98 0.01 250);
+  --secondary: oklch(0.94 0.02 250);
+  --secondary-foreground: oklch(0.28 0.09 265);
+  --muted: oklch(0.95 0.015 248);
+  --muted-foreground: oklch(0.48 0.04 258);
+  --accent: oklch(0.93 0.03 250);
+  --accent-foreground: oklch(0.28 0.09 265);
+  --destructive: oklch(0.55 0.2 25);
+  --destructive-foreground: oklch(0.98 0.01 250);
+  --border: oklch(0.28 0.07 265 / 10%);
+  --input: oklch(0.28 0.07 265 / 14%);
+  --ring: oklch(0.5 0.2 262);
+  --royal: oklch(0.5 0.2 262);
+  --royal-deep: oklch(0.3 0.12 266);
+  --royal-glow: oklch(0.62 0.19 255);
+  --sky-pop: oklch(0.52 0.12 232);
+  --gold: oklch(0.7 0.13 82);
+  --gold-soft: oklch(0.84 0.09 88);
+  --cotton: oklch(0.98 0.005 250);
+  --gradient-gold: linear-gradient(120deg, oklch(0.8 0.115 85), oklch(0.66 0.11 72));
+
+  --t2: var(--foreground);
+  --t3: color-mix(in oklab, var(--foreground) 70%, transparent);
+}
+
+/* ───────────────────────── Dark tokens ───────────────────────── */
+.dark {
+  --background: oklch(0 0 0);
+  --foreground: oklch(0.98 0.01 250);
+  --card: oklch(0.16 0.05 265);
+  --card-foreground: oklch(0.98 0.01 250);
+  --popover: oklch(0.16 0.05 265);
+  --popover-foreground: oklch(0.98 0.01 250);
+  --primary: oklch(0.5 0.2 262);
+  --primary-foreground: oklch(0.98 0.01 250);
+  --secondary: oklch(0.22 0.05 265);
+  --secondary-foreground: oklch(0.98 0.01 250);
+  --muted: oklch(0.2 0.04 265);
+  --muted-foreground: oklch(0.78 0.03 255);
+  --accent: oklch(0.24 0.06 265);
+  --accent-foreground: oklch(0.98 0.01 250);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 16%);
+
+  --t2: oklch(1 0 0 / 0.85);
+  --t3: oklch(1 0 0 / 0.65);
+}
+
+/* Re-declares the light tokens inside a dark page (used by the light-glass header) */
+.eb-light {
+  --foreground: oklch(0.22 0.065 265);
+  --muted-foreground: oklch(0.48 0.04 258);
+  --border: oklch(0.28 0.07 265 / 10%);
+  --t2: oklch(0.22 0.065 265);
+  --t3: color-mix(in oklab, oklch(0.22 0.065 265) 70%, transparent);
+}
+
+/* ───────────────────────── Signature utilities ───────────────────────── */
+@utility glass {
+  background: oklch(1 0 0 / 0.68);
+  backdrop-filter: blur(18px) saturate(160%);
+  border: 1px solid oklch(0.28 0.07 265 / 0.08);
+  box-shadow: 0 8px 40px -16px oklch(0.3 0.1 265 / 0.18);
+}
+@utility glass-strong {
+  background: oklch(1 0 0 / 0.85);
+  backdrop-filter: blur(26px) saturate(150%);
+  border: 1px solid oklch(0.28 0.07 265 / 0.1);
+}
+@utility aurora-blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(90px);
+  pointer-events: none;
+}
+@utility text-gradient-royal {
+  background-image: linear-gradient(
+    115deg,
+    var(--royal-deep) 0%,
+    var(--primary) 45%,
+    var(--royal-glow) 95%
+  );
+  background-clip: text;
+  color: transparent;
+}
+@utility text-gradient-gold {
+  background-image: linear-gradient(115deg, var(--gold), var(--gold-soft) 120%);
+  background-clip: text;
+  color: transparent;
+}
+@utility text-gold-gradient {
+  background: var(--gradient-gold);
+  background-clip: text;
+  color: transparent;
+}
+@utility bg-gradient-gold {
+  background: var(--gradient-gold);
+}
+@utility hero-gradient {
+  background: linear-gradient(
+    150deg,
+    oklch(0.42 0.17 264) 0%,
+    oklch(0.32 0.13 266) 50%,
+    oklch(0.24 0.1 268) 100%
+  );
+}
+@utility glow-card {
+  transition:
+    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.4s,
+    border-color 0.4s;
+  &:hover {
+    transform: translateY(-4px);
+    border-color: oklch(0.62 0.19 255 / 0.35);
+    box-shadow:
+      0 24px 70px -24px color-mix(in oklab, var(--royal) 30%, transparent),
+      0 0 0 1px oklch(0.62 0.19 255 / 0.14);
+  }
+}
+
+/* background blobs + flowing route dashes */
+@keyframes ebDrift {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(28px, -22px, 0) scale(1.08); }
+}
+@keyframes ebFlow {
+  to { stroke-dashoffset: -28; }
+}
+@utility eb-drift {
+  animation: ebDrift 16s ease-in-out infinite;
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+@utility eb-flow {
+  animation: ebFlow 1.4s linear infinite;
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+/* ───────────────────────── Theme-aware building blocks ───────────────────────── */
+@layer components {
+  /* Frosted section glass. Light = white veil, dark = midnight navy */
+  .eb-panel {
+    background: oklch(1 0 0 / var(--panel-a, 0.6));
+    -webkit-backdrop-filter: blur(40px);
+    backdrop-filter: blur(40px);
+  }
+  .eb-panel.eb-about {
+    background:
+      linear-gradient(90deg, rgb(255 255 255 / 0.7), rgb(255 255 255 / 0.35) 50%, transparent),
+      linear-gradient(
+        135deg,
+        #fff 0%,
+        color-mix(in oklab, var(--royal-glow) 60%, transparent) 55%,
+        transparent 100%
+      ),
+      rgb(255 255 255 / 0.3);
+  }
+  .dark .eb-panel,
+  .dark .eb-panel.eb-about {
+    background:
+      radial-gradient(60% 50% at 50% 0%, rgb(59 130 246 / 0.18), transparent 70%),
+      linear-gradient(135deg, rgb(11 26 74 / 0.9), rgb(8 18 51 / 0.9) 50%, rgb(5 11 34 / 0.95));
+  }
+
+  /* Gradient-frame card: padding comes from --p (light) / --pd (dark) */
+  .eb-pad { padding: var(--p); }
+  .eb-in { border-radius: calc(var(--r) - var(--p)); }
+  .dark .eb-pad { padding: var(--pd, var(--p)); }
+  .dark .eb-in { border-radius: calc(var(--r) - var(--pd, var(--p))); }
+
+  .eb-frame {
+    background-image: linear-gradient(
+      to bottom right,
+      rgb(255 255 255 / 0.8),
+      var(--royal-glow),
+      var(--primary)
+    );
+  }
+  .dark .eb-frame {
+    background-image: none;
+    border: 1px solid rgb(255 255 255 / 0.1);
+  }
+
+  /* inner card fills */
+  .eb-fill { background-color: color-mix(in oklab, var(--royal-deep) 80%, transparent); }
+  .eb-fill-soft { background-color: oklch(1 0 0 / 0.8); }
+  .dark .eb-fill,
+  .dark .eb-fill-soft { background-color: rgb(11 26 74 / 0.9); }
+
+  /* small tiles (Honesty / Professionalism / Efficiency) */
+  .eb-tile {
+    border: 1px solid rgb(255 255 255 / 0.8);
+    background: rgb(255 255 255 / 0.6);
+    -webkit-backdrop-filter: blur(24px);
+    backdrop-filter: blur(24px);
+  }
+  .eb-tile:hover { background: rgb(255 255 255 / 0.8); }
+  .dark .eb-tile,
+  .dark .eb-tile:hover {
+    border-color: rgb(255 255 255 / 0.1);
+    background: rgb(11 26 74 / 0.9);
+  }
+
+  /* gradient wash behind a whole section */
+  .eb-backdrop-panel {
+    background-image: linear-gradient(
+      180deg,
+      transparent 0%,
+      color-mix(in oklab, var(--royal-glow) calc(var(--bd, 14) * 1%), white) 45%,
+      transparent 100%
+    );
+  }
+  .dark .eb-backdrop-panel {
+    background-image: linear-gradient(
+      180deg,
+      transparent 0%,
+      color-mix(in oklab, var(--primary) calc(var(--bd, 14) * 1.5%), transparent) 45%,
+      transparent 100%
+    );
+  }
+
+  /* route lines in the logistics section */
+  .eb-route { --route: var(--royal-deep); }
+  .dark .eb-route { --route: var(--royal-glow); }
+}
+
+/* Unlayered on purpose: must beat the `text-gradient-royal` utility */
+.dark .text-gradient-royal {
+  background-image: linear-gradient(to right, #7dd3fc, #60a5fa, #0284c7);
+}
+
+/* ───────────────────────── Base ───────────────────────── */
+@layer base {
+  * { border-color: var(--color-border); }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection {
+    background: color-mix(in oklab, var(--royal) 25%, transparent);
+    color: var(--royal-deep);
+  }
+  .dark ::selection { color: #fff; }
+}
+
+/* Lenis smooth scrolling */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+/* Theme switch cross-fade (View Transitions API) */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.45s;
+  animation-timing-function: ease-in-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) { animation: none; }
+}
+
+/* ───────────────────────── Gradient scrollbar ───────────────────────── */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: oklch(0.3 0.12 266) transparent;
+}
+::-webkit-scrollbar { width: 12px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  border-radius: 99px;
+  border: 3px solid transparent;
+  background-clip: padding-box;
+  background-image: linear-gradient(
+    to bottom,
+    oklch(0.3 0.12 266) 0%,
+    oklch(0.42 0.14 264) 45%,
+    oklch(0.62 0.19 255) 95%
+  );
+}
+::-webkit-scrollbar-thumb:hover { border: 2px solid transparent; }
