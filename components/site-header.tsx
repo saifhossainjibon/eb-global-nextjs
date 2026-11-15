@@ -60,7 +60,7 @@ export function SiteHeader() {
   return (
     // `eb-light` keeps the header's light glass + dark text in BOTH themes
     <header className="eb-light fixed inset-x-0 top-0 z-50">
-      <div className="mx-auto max-w-7xl px-4 pt-4 ">
+      <div className="mx-auto max-w-7xl px-4 pt-4">
         <div className="glass relative isolate flex items-center justify-between rounded-full py-1 pr-4 pl-2 shadow-[0_14px_40px_-14px_color-mix(in_oklab,var(--royal-deep)_55%,transparent),0_4px_14px_-6px_color-mix(in_oklab,var(--primary)_35%,transparent)] ring-1 ring-white/50 ring-inset sm:px-6">
           <span aria-hidden className="pointer-events-none absolute inset-0 -z-10 rounded-full bg-linear-to-r from-[var(--royal-deep)]/12 via-[var(--primary)]/6 to-[var(--royal-glow)]/14" />
           <span aria-hidden className="pointer-events-none absolute inset-x-8 bottom-0 -z-10 h-px bg-linear-to-r from-transparent via-[var(--primary)]/60 to-transparent" />

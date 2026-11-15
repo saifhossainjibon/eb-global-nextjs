@@ -123,21 +123,27 @@
 
 /* ───────────────────────── Signature utilities ───────────────────────── */
 @utility glass {
-  background: oklch(1 0 0 / 0.68);
-  backdrop-filter: blur(18px) saturate(160%);
+  background: oklch(1 0 0 / 0.72);
+  backdrop-filter: blur(12px);
   border: 1px solid oklch(0.28 0.07 265 / 0.08);
   box-shadow: 0 8px 40px -16px oklch(0.3 0.1 265 / 0.18);
 }
 @utility glass-strong {
   background: oklch(1 0 0 / 0.85);
-  backdrop-filter: blur(26px) saturate(150%);
+  backdrop-filter: blur(16px);
   border: 1px solid oklch(0.28 0.07 265 / 0.1);
+}
+/* Soft glow WITHOUT a blur filter: a radial mask fades the circle out (much cheaper to paint) */
+@utility soft-blob {
+  -webkit-mask-image: radial-gradient(closest-side, #000 25%, transparent 100%);
+  mask-image: radial-gradient(closest-side, #000 25%, transparent 100%);
 }
 @utility aurora-blob {
   position: absolute;
   border-radius: 9999px;
-  filter: blur(90px);
   pointer-events: none;
+  -webkit-mask-image: radial-gradient(closest-side, #000 25%, transparent 100%);
+  mask-image: radial-gradient(closest-side, #000 25%, transparent 100%);
 }
 @utility text-gradient-royal {
   background-image: linear-gradient(
@@ -184,34 +190,14 @@
   }
 }
 
-/* background blobs + flowing route dashes */
-@keyframes ebDrift {
-  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
-  50% { transform: translate3d(28px, -22px, 0) scale(1.08); }
-}
-@keyframes ebFlow {
-  to { stroke-dashoffset: -28; }
-}
-@utility eb-drift {
-  animation: ebDrift 16s ease-in-out infinite;
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
-  }
-}
-@utility eb-flow {
-  animation: ebFlow 1.4s linear infinite;
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
-  }
-}
 
 /* ───────────────────────── Theme-aware building blocks ───────────────────────── */
 @layer components {
   /* Frosted section glass. Light = white veil, dark = midnight navy */
   .eb-panel {
     background: oklch(1 0 0 / var(--panel-a, 0.6));
-    -webkit-backdrop-filter: blur(40px);
-    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
   }
   .eb-panel.eb-about {
     background:
@@ -226,6 +212,9 @@
   }
   .dark .eb-panel,
   .dark .eb-panel.eb-about {
+    /* nearly opaque in dark mode, so no blur is needed */
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
     background:
       radial-gradient(60% 50% at 50% 0%, rgb(59 130 246 / 0.18), transparent 70%),
       linear-gradient(135deg, rgb(11 26 74 / 0.9), rgb(8 18 51 / 0.9) 50%, rgb(5 11 34 / 0.95));
@@ -254,22 +243,29 @@
   .eb-fill { background-color: color-mix(in oklab, var(--royal-deep) 80%, transparent); }
   .eb-fill-soft { background-color: oklch(1 0 0 / 0.8); }
   .dark .eb-fill,
-  .dark .eb-fill-soft { background-color: rgb(11 26 74 / 0.9); }
+  .dark .eb-fill-soft {
+  background-image: linear-gradient(135deg, #1f46a8, #162f84 55%, #0c1f5e);
+}
+  /* .dark .eb-fill-soft { background-color: rgb(11 26 74 / 0.9); } */
 
   /* small tiles (Honesty / Professionalism / Efficiency) */
   .eb-tile {
     border: 1px solid rgb(255 255 255 / 0.8);
     background: rgb(255 255 255 / 0.6);
-    -webkit-backdrop-filter: blur(24px);
-    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
   }
   .eb-tile:hover { background: rgb(255 255 255 / 0.8); }
-  .dark .eb-tile,
+  /* .dark .eb-tile,
   .dark .eb-tile:hover {
     border-color: rgb(255 255 255 / 0.1);
     background: rgb(11 26 74 / 0.9);
-  }
-
+  } */
+.dark .eb-tile,
+.dark .eb-tile:hover {
+  border-color: rgb(255 255 255 / 0.1);
+  background: linear-gradient(135deg, #1f46a8, #162f84 55%, #0c1f5e);
+}
   /* gradient wash behind a whole section */
   .eb-backdrop-panel {
     background-image: linear-gradient(
@@ -314,23 +310,6 @@
   .dark ::selection { color: #fff; }
 }
 
-/* Lenis smooth scrolling */
-html.lenis, html.lenis body { height: auto; }
-.lenis.lenis-smooth { scroll-behavior: auto !important; }
-.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
-.lenis.lenis-stopped { overflow: hidden; }
-
-/* Theme switch cross-fade (View Transitions API) */
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation-duration: 0.45s;
-  animation-timing-function: ease-in-out;
-}
-@media (prefers-reduced-motion: reduce) {
-  ::view-transition-old(root),
-  ::view-transition-new(root) { animation: none; }
-}
-
 /* ───────────────────────── Gradient scrollbar ───────────────────────── */
 html {
   scrollbar-width: thin;
@@ -350,3 +329,34 @@ html {
   );
 }
 ::-webkit-scrollbar-thumb:hover { border: 2px solid transparent; }
+
+/* Fraunces: let the browser pick the optical size from the font size (display cut on big headlines) */
+.font-latic {
+  font-optical-sizing: auto;
+}
+
+/* ───────────────────────── Motion (CSS only, compositor-friendly) ───────────────────────── */
+html { scroll-behavior: smooth; }
+section[id], [id="contact"] { scroll-margin-top: 4.5rem; }
+
+/* entrance: opacity + translate only; toggled by one shared IntersectionObserver */
+.eb-reveal {
+  opacity: 0;
+  transform: translate3d(var(--rx, 0px), var(--ry, 16px), 0);
+  transition:
+    opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.eb-reveal.is-in { opacity: 1; transform: none; }
+
+/* hero headline lines + divider (play once on load) */
+@keyframes ebMask { from { transform: translateY(150%); } to { transform: none; } }
+.eb-mask { animation: ebMask 0.8s cubic-bezier(0.22, 1, 0.36, 1) both; animation-delay: var(--d, 0s); }
+@keyframes ebBar { from { transform: scaleX(0); opacity: 0; } to { transform: none; opacity: 1; } }
+.eb-bar-in { animation: ebBar 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.55s both; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .eb-reveal { opacity: 1; transform: none; transition: none; }
+  .eb-mask, .eb-bar-in { animation: none; }
+}

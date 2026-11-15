@@ -1,8 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { useScroll, useTransform } from "motion/react";
-import * as m from "motion/react-m";
 import {
   ArrowUpRight,
   Briefcase,
@@ -20,10 +18,10 @@ import {
   Ship,
   Sparkles,
   Users,
+  UsersCollaboration,
   Zap,
   type LucideIcon,
 } from "lucide-react";
-import { useRef } from "react";
 
 import marketing from "@/assets/marketing.png";
 import heroPoster from "@/assets/hero-poster.png";
@@ -39,12 +37,10 @@ import {
   LINES_ALL,
   LINES_BOTTOM,
   LINES_TEAM,
-  Magnetic,
   MaskLine,
   Reveal,
   ScrollProgress,
   SharedDefs,
-  Tilt,
   UserAvatar,
 } from "./motion-kit";
 import { DarkCard, IntroCard, LazyVideo, SectionHead, SectionPanel, imgSrc } from "./ui-kit";
@@ -121,40 +117,32 @@ const DESKTOP_ROUTES = [
 
 /** gradient pill text shared by the origin labels */
 const PLANT_GLOW =
-  "absolute -bottom-10 -left-10 size-[26rem] rounded-full bg-[var(--royal-glow)]/35 blur-3xl dark:bg-[var(--royal-glow)]/30";
+  "absolute -bottom-10 -left-10 size-[26rem] rounded-full bg-[var(--royal-glow)]/35 soft-blob dark:bg-[var(--royal-glow)]/30";
 
 /* ───────────────────────────── Hero ───────────────────────────── */
 
 function Hero() {
-  const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "18%"]);
-  const contentY = useTransform(scrollYProgress, [0, 1], ["0%", "10%"]);
-
   return (
     <section
-      ref={ref}
       id="home"
       className="relative z-10 flex min-h-screen items-center overflow-hidden px-6 pt-22 pb-20"
     >
-      <m.div aria-hidden style={{ y: bgY }} className="absolute inset-0 scale-110 will-change-transform">
+      <div aria-hidden className="absolute inset-0">
         <LazyVideo eager src={HERO_VIDEO} poster={heroPoster.src} className="h-full w-full object-cover" />
-      </m.div>
+      </div>
 
       <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/35 to-black/90 dark:from-black/10 dark:to-black" />
       <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-transparent to-transparent dark:from-black/90" />
 
-      <m.div style={{ y: contentY }} className="relative mx-auto w-full max-w-5xl will-change-transform">
+      <div className="relative mx-auto w-full max-w-5xl">
         <div className="mx-auto max-w-5xl text-center">
           <Reveal delay={0.1} y={20}>
-            <span className="mt-4 inline-flex items-center gap-2.5 rounded-full border border-white/30 bg-white/10 px-4 py-1.5 text-[10px] font-semibold tracking-[0.3em] text-white/90 uppercase shadow-lg shadow-black/20 backdrop-blur-xl">
-              <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+            <p className="mt-4 inline-flex items-center gap-2.5 rounded-full border border-white/30 bg-white/20 px-4 py-1.5 text-[11px] font-extrabold tracking-[0.3em] text-white uppercase shadow-lg shadow-black/20 backdrop-blur-md">
               Cotton Indenting &amp; Sourcing
-            </span>
+            </p>
           </Reveal>
 
-          {/* <h1 className="mt-8 font-latic text-[2.75rem] leading-[1.02] tracking-[-0.02em] text-white [text-shadow:0_4px_30px_rgba(0,0,0,0.35)] sm:text-6xl lg:text-[5.25rem]"> */}
-          <h1 className="mt-8 font-latic text-[2.75rem] leading-[1.02] font-light tracking-[-0.02em] text-white [text-shadow:0_4px_30px_rgba(0,0,0,0.35)] sm:text-6xl lg:text-[5.25rem]">
+          <h1 className="mt-8 font-latic text-[2.75rem] leading-[1.02] font-semibold tracking-[-0.02em] text-white [text-shadow:0_4px_30px_rgba(0,0,0,0.35)] sm:text-6xl lg:text-[5.25rem]">
             <MaskLine delay={0.25}>A Trusted Bridge</MaskLine>
             <MaskLine
               delay={0.4}
@@ -164,12 +152,7 @@ function Hero() {
             </MaskLine>
           </h1>
 
-          <m.div
-            className="mx-auto mt-7 h-1 w-24 rounded-full bg-linear-to-r from-transparent via-amber-300 to-transparent"
-            initial={{ scaleX: 0, opacity: 0 }}
-            animate={{ scaleX: 1, opacity: 1 }}
-            transition={{ duration: 0.9, delay: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          />
+          <div className="eb-bar-in mx-auto mt-7 h-1 w-24 rounded-full bg-linear-to-r from-transparent via-amber-300 to-transparent" />
 
           <Reveal delay={0.75} y={20}>
             <p className="mx-auto mt-7 max-w-3xl text-lg leading-relaxed text-white/95 [text-shadow:0_1px_8px_rgba(0,0,0,0.6)] sm:text-xl">
@@ -180,10 +163,10 @@ function Hero() {
 
           <Reveal delay={0.9} y={20}>
             <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
-              <Magnetic>
+              <>
                 <a
                   href="#team"
-                  className="group inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-neutral-900 shadow-xl shadow-black/25 ring-4 ring-white/20 transition-all hover:-translate-y-0.5 hover:bg-amber-300 hover:shadow-2xl"
+                  className="group inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-neutral-900 shadow-xl shadow-black/25 ring-4 ring-white/20 transition-[transform,background-color] duration-200 hover:-translate-y-0.5 hover:bg-amber-300"
                 >
                   Explore Our Team
                   <svg
@@ -196,15 +179,15 @@ function Hero() {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                   </svg>
                 </a>
-              </Magnetic>
-              <Magnetic>
+              </>
+              <>
                 <a
                   href="#contact"
-                  className="inline-flex items-center rounded-full border border-white/40 bg-white/10 px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-black/20 backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:bg-white/20"
+                  className="inline-flex items-center rounded-full border border-white/40 bg-white/10 px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-black/20 backdrop-blur-md transition-[transform,background-color] duration-200 hover:-translate-y-0.5 hover:bg-white/20"
                 >
                   Contact Us
                 </a>
-              </Magnetic>
+              </>
             </div>
           </Reveal>
         </div>
@@ -212,9 +195,9 @@ function Hero() {
         <div className="mx-auto mt-16 grid max-w-4xl grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
           {STATS.map((stat, i) => (
             <Reveal key={stat.label} delay={1 + i * 0.12} y={40} className="h-full">
-              <Tilt className="h-full">
-                <div className="group h-full rounded-3xl shadow-xl shadow-black/30 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl motion-reduce:transition-none motion-reduce:hover:translate-y-0">
-                  <div className="relative h-full overflow-hidden rounded-2xl bg-white/10 px-4 py-4 text-center backdrop-blur-2xl">
+              <>
+                <div className="group h-full rounded-3xl shadow-xl shadow-black/30 transition-transform duration-300 hover:-translate-y-1.5 motion-reduce:transition-none motion-reduce:hover:translate-y-0">
+                  <div className="relative h-full overflow-hidden rounded-2xl bg-white/10 px-4 py-4 text-center backdrop-blur-md">
                     <div
                       aria-hidden
                       className="pointer-events-none absolute inset-x-5 top-0 h-px bg-linear-to-r from-transparent via-white/60 to-transparent"
@@ -232,11 +215,11 @@ function Hero() {
                     </div>
                   </div>
                 </div>
-              </Tilt>
+              </>
             </Reveal>
           ))}
         </div>
-      </m.div>
+      </div>
     </section>
   );
 }
@@ -245,10 +228,10 @@ function Hero() {
 
 function About() {
   return (
-    <section id="about" className="backdrop-blur-2xl">
-      <div className="relative isolate">
-        <Backdrop panel={false} blobs={["top-80 left-0 size-72", "right-0 bottom-40 size-80"]} />
-        <Backdrop panel={false} blobs={["top-180 right-0 size-72", "right-0 bottom-40 size-80"]} />
+    <section id="about">
+      <div className="relative isolate mt-2">
+        <Backdrop panel={false} blobs={["top-20 left-0 size-72", "right-10 bottom-0 size-80"]} />
+        <Backdrop panel={false} blobs={["top-180 right-0 size-72", "left-0 bottom-120 size-80"]} />
 
         <div className="relative overflow-hidden px-4 py-16 sm:px-8 sm:py-24">
           {/* ───────── Who We Are ───────── */}
@@ -256,12 +239,12 @@ function About() {
             <SectionPanel
               about
               lines={LINES_BOTTOM}
-              className="mx-auto mt-28 max-w-7xl"
+              className="mx-auto mt-2 max-w-7xl"
               deco={
                 <>
-                  <div className="absolute -top-24 -left-24 size-72 rounded-full bg-white/70 blur-3xl dark:hidden" />
-                  <div className="absolute right-1/4 -bottom-20 size-72 rounded-full bg-[var(--primary)]/20 blur-3xl dark:hidden" />
-                  <div className="absolute -bottom-10 -left-10 hidden size-[26rem] rounded-full bg-[var(--royal-glow)]/30 blur-3xl dark:block" />
+                  <div className="absolute -top-24 -left-24 size-72 rounded-full bg-white/70 soft-blob dark:hidden" />
+                  <div className="absolute right-1/4 -bottom-20 size-72 rounded-full bg-[var(--primary)]/20 soft-blob dark:hidden" />
+                  <div className="absolute -bottom-10 -left-10 hidden size-[26rem] rounded-full bg-[var(--royal-glow)]/30 soft-blob dark:block" />
                   <Image
                     src={cottonRight}
                     alt=""
@@ -314,7 +297,7 @@ function About() {
                   <ul className="mt-9 grid gap-3 sm:grid-cols-3">
                     {VALUES.map(({ icon: Icon, title, text }, i) => (
                       <Reveal as="li" key={title} delay={i * 0.1} y={24}>
-                        <div className="eb-tile group h-full rounded-2xl p-4 shadow-lg shadow-[var(--royal-deep)]/10 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-[var(--royal-deep)]/20 motion-reduce:transition-none motion-reduce:hover:translate-y-0 dark:shadow-[#0b1a4a]/40 dark:hover:shadow-[#0b1a4a]/60">
+                        <div className="eb-tile group h-full rounded-2xl p-4 shadow-lg shadow-[var(--royal-deep)]/10 transition-transform duration-300 hover:-translate-y-1 motion-reduce:transition-none motion-reduce:hover:translate-y-0 dark:shadow-[#0b1a4a]/40">
                           <span className="mb-3 inline-flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-[var(--royal-deep)] via-[var(--primary)] to-[var(--royal-glow)] shadow-md shadow-primary/30 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3 dark:border dark:border-white/20 dark:bg-none dark:bg-white/10 dark:shadow-lg">
                             <Icon className="h-5 w-5 text-white" aria-hidden />
                           </span>
@@ -332,12 +315,11 @@ function About() {
                     radius="2rem"
                     pad="1.5px"
                     hover="hover:shadow-2xl"
-                    className=" shadow-2xl shadow-[var(--royal-deep)]/30 dark:shadow-[#0b1a4a]/60"
+                    className="shadow-2xl shadow-[var(--royal-deep)]/30 dark:shadow-[#0b1a4a]/60"
                     innerClassName="flex min-h-[22rem] flex-col justify-between p-8 sm:p-10"
                     line="via-white/60 dark:via-white/40"
                     aurora={[
-                      "-top-16 -right-16 size-64 bg-[var(--royal-glow)]/40",
-                      "-bottom-24 -left-16 size-56 bg-amber-400/15 blur-3xl",
+                      "-top-16 -right-16 size-64 bg-[var(--royal-glow)]/40"
                     ]}
                   >
                     <div
@@ -362,7 +344,6 @@ function About() {
                       </p>
                     </div>
                     <div className="relative mt-10 flex items-center gap-3 border-t border-white/10 pt-5">
-                      <span className="size-2 rounded-full bg-amber-400" />
                       <span className="text-[11px] font-semibold tracking-[0.24em] text-white/70 uppercase">
                         EB Global · The Cotton Diplomat
                       </span>
@@ -403,7 +384,7 @@ function About() {
                   const Icon = SOLUTION_ICONS[i]!;
                   return (
                     <FanIn key={solution.title} index={i} cols={4} className="h-full">
-                      <Tilt className="h-full">
+                      <>
                         <DarkCard
                           always
                           radius="var(--radius-3xl)"
@@ -423,7 +404,7 @@ function About() {
                             <div className="mt-6 h-[3px] w-10 rounded-full bg-linear-to-r from-white to-white/10 transition-all duration-500 group-hover:w-full dark:from-amber-300" />
                           </div>
                         </DarkCard>
-                      </Tilt>
+                      </>
                     </FanIn>
                   );
                 })}
@@ -440,12 +421,16 @@ function About() {
 
 function Excellence() {
   return (
-    <section className="relative isolate overflow-x-clip px-4 pt-10 sm:px-6">
-      <Backdrop blobs={["top-100 right-30 size-80", "top-00 left-10 size-80", "bottom-00 left-0 size-72"]} />
+    <section className="relative isolate overflow-x-clip px-4 pt-4 sm:px-6">
+      <Backdrop blobs={[
+        "top-100 left-30 size-80", 
+        // "top-00 left-10 size-80", 
+        // "bottom-00 left-0 size-72"
+        ]} />
 
       <div className="relative isolate mx-auto max-w-7xl">
         <div aria-hidden className="pointer-events-none absolute inset-0 z-11 hidden sm:block">
-          <div className="absolute -bottom-8 -left-6 size-[20rem] rounded-full bg-[var(--royal-glow)]/35 blur-3xl sm:size-[26rem] dark:bg-[var(--royal-glow)]/30" />
+          <div className="absolute -bottom-8 -left-6 size-[20rem] rounded-full bg-[var(--royal-glow)]/35 soft-blob sm:size-[26rem] dark:bg-[var(--royal-glow)]/30" />
           <CottonPlant className="absolute -bottom-0 -left-4 w-[16rem] sm:-left-4 sm:w-[22rem] lg:w-[28rem]" />
         </div>
 
@@ -467,13 +452,7 @@ function Excellence() {
                 </h2>
                 <Bar className="mt-6" />
 
-                <m.svg
-                  aria-hidden
-                  viewBox="0 0 320 320"
-                  className="mt-12 hidden w-full max-w-[17rem] lg:block"
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 80, repeat: Infinity, ease: "linear" }}
-                >
+                <svg aria-hidden viewBox="0 0 320 320" className="mt-12 hidden w-full max-w-[17rem] lg:block">
                   <defs>
                     <linearGradient id="wy-ring" x1="0" y1="0" x2="1" y2="1">
                       <stop offset="0%" style={{ stopColor: "var(--royal-deep)" }} />
@@ -507,7 +486,7 @@ function Excellence() {
                     transform="rotate(45 160 160)"
                     fill="url(#wy-ring)"
                   />
-                </m.svg>
+                </svg>
               </div>
             </Reveal>
 
@@ -590,11 +569,11 @@ function TeamProfile() {
 
             <Reveal delay={0.2}>
               <IntroCard
-                icon={Ship}
+                icon={UsersCollaboration}
                 radius="var(--radius-xl)"
                 pad="3px"
                 darkPad="1.5px"
-                amberBar={false}
+                // amberBar={false}
                 className="hover:shadow-[var(--royal-deep)]/40"
               >
                 EB Global is run by a dedicated team of four: Kazi Raiyan Hasan, Kazi Rakib Hasan, Shafiul Yeasin,
@@ -604,7 +583,6 @@ function TeamProfile() {
                 smoothly.
               </IntroCard>
             </Reveal>
-
             <div className="relative mt-14 sm:mt-16">
               <div
                 aria-hidden
@@ -614,7 +592,7 @@ function TeamProfile() {
               <div className="relative grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
                 {TEAM.map((member, i) => (
                   <FanIn key={member.name} index={i} cols={4} className="h-full">
-                    <Tilt className="h-full">
+                    <>
                       <DarkCard
                         radius="var(--radius-sm)"
                         pad="3px"
@@ -640,7 +618,7 @@ function TeamProfile() {
                         </h3>
                         <div className="relative mt-4 h-[3px] w-10 rounded-full bg-linear-to-r from-white to-white/10 transition-all duration-500 group-hover:w-24 dark:from-amber-300" />
                       </DarkCard>
-                    </Tilt>
+                    </>
                   </FanIn>
                 ))}
               </div>
@@ -656,7 +634,7 @@ function TeamProfile() {
 
 function Logistics() {
   return (
-    <section className="relative isolate mb-6 px-4 pt-28 sm:px-6" aria-labelledby="logistics-heading">
+    <section className="relative isolate mb-2 px-4 pt-30 sm:px-6" aria-labelledby="logistics-heading">
       <Backdrop blobs={["top-32 right-[8%] size-72", "bottom-10 left-[8%] size-80"]} />
 
       <div className="mx-auto max-w-7xl">
@@ -686,7 +664,6 @@ function Logistics() {
                   <br />
                   <span className="text-gradient-royal">spinning mill</span>
                 </h2>
-                <Bar className="mt-6" />
               </div>
 
               <div className="lg:col-span-3">
@@ -730,7 +707,6 @@ function Logistics() {
                         strokeWidth="2.5"
                         strokeLinecap="round"
                         strokeDasharray="1 11"
-                        className="eb-flow"
                       />
                       <circle cx="47" cy={y} r="3.5" fill="var(--primary)" />
                     </g>
@@ -798,7 +774,6 @@ function Logistics() {
                         strokeLinecap="round"
                         strokeDasharray="1 13"
                         vectorEffect="non-scaling-stroke"
-                        className="eb-flow"
                       />
                     </g>
                   ))}
@@ -816,10 +791,6 @@ function Logistics() {
               <Reveal delay={0.4} y={20} className="relative mt-5 pl-12 md:mt-0 md:pl-0">
                 <div className="relative mx-auto flex w-full items-center justify-center md:w-fit">
                   <span aria-hidden className="absolute inset-0 rounded-full bg-[var(--royal-glow)]/50 blur-xl" />
-                  <span
-                    aria-hidden
-                    className="absolute -inset-1 animate-ping rounded-full border border-[var(--royal-glow)]/40 [animation-duration:3s] motion-reduce:animate-none"
-                  />
                   <div className="relative flex h-16 w-full items-center justify-center gap-3 rounded-full bg-gradient-to-r from-[var(--royal-deep)] via-[var(--primary)] to-[var(--royal-glow)] px-6 shadow-2xl shadow-[var(--royal-deep)]/40 ring-4 ring-white/70 sm:px-8 md:h-auto md:w-auto md:py-4 dark:shadow-[#0b1a4a]/60 dark:ring-white/20">
                     <span className="flex size-10 shrink-0 items-center justify-center rounded-full border border-white/30 bg-white/20 backdrop-blur-md">
                       <Factory className="h-5 w-5 text-white" aria-hidden />
@@ -842,8 +813,8 @@ function Logistics() {
 
 function MarketingTeam() {
   return (
-    <section className="relative isolate mb-18 px-6 pt-28" aria-labelledby="marketing-heading">
-      <Backdrop blobs={["top-32 left-[8%] size-72", "right-[8%] bottom-10 size-80"]} />
+    <section className="relative isolate mb-14 px-6 pt-28" aria-labelledby="marketing-heading">
+      <Backdrop blobs={["top-32 right-[8%] size-72", "left-[8%] bottom-10 size-80"]} />
 
       <div className="mx-auto max-w-7xl">
         <Reveal>
@@ -852,7 +823,7 @@ function MarketingTeam() {
               src={marketing}
               alt="EB Global marketing and business development team"
               sizes="(min-width: 1280px) 1280px, 100vw"
-              className="h-full w-full object-cover object-center transition-transform duration-[900ms] ease-out group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+              className="h-full w-full object-cover object-center"
             />
             <div
               aria-hidden
@@ -954,25 +925,25 @@ function MembershipsContact() {
                     {MEMBERSHIPS.map((mem) => (
                       <li
                         key={mem.abbr}
-                        className="group relative flex flex-col items-center p-8 transition-colors duration-300 hover:bg-white/5 sm:p-10"
+                        className="group relative flex flex-col items-center p-8 sm:p-10"
                       >
                         <div className="relative w-fit">
-                          <div className="absolute inset-0 rounded-full bg-white/30 blur-md transition-opacity duration-300 group-hover:bg-white/50" />
+                          <div className="absolute inset-0 " />
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             src={imgSrc(mem.logo)}
                             alt={`${mem.name} (${mem.abbr}) logo`}
-                            className="relative size-26 rounded-full bg-white object-contain p-1 transition-transform duration-500 group-hover:scale-110"
+                            className="relative size-26 rounded-full bg-white object-contain p-1 transition-transform duration-500"
                             loading="lazy"
                             width={600}
                             height={600}
                           />
                         </div>
-                        <p className="mt-8 font-display text-3xl font-extrabold tracking-tight text-white transition-colors duration-300 group-hover:text-sky-200">
+                        <p className="mt-8 font-display text-3xl font-extrabold tracking-tight text-white ">
                           {mem.abbr}
                         </p>
-                        <p className="mt-1 text-sm font-semibold text-white/90">{mem.name}</p>
-                        <p className="mt-4 text-center text-sm leading-relaxed text-white/60">{mem.desc}</p>
+                        <p className="text-center mt-1 text-sm font-semibold text-white/90">{mem.name}</p>
+                        <p className="mt-4 text-center text-sm leading-relaxed text-white/80">{mem.desc}</p>
                       </li>
                     ))}
                   </ul>
@@ -1016,14 +987,7 @@ function MembershipsContact() {
 
             <ul className="relative grid gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
               {CONTACT_ITEMS.map((item, i) => (
-                <m.li
-                  key={item.label}
-                  initial={{ opacity: 0, y: 30, scale: 0.96 }}
-                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: i * 0.09, ease: [0.22, 1, 0.36, 1] }}
-                  className="h-full"
-                >
+                <Reveal as="li" key={item.label} delay={i * 0.07} y={20} className="h-full">
                   <DarkCard
                     radius="var(--radius-3xl)"
                     pad="1.5px"
@@ -1065,7 +1029,7 @@ function MembershipsContact() {
                       )}
                     </div>
                   </DarkCard>
-                </m.li>
+                </Reveal>
               ))}
             </ul>
           </SectionPanel>

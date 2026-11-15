@@ -55,10 +55,9 @@ export function SiteFooter() {
             <div className="relative flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-center">
               <div className="max-w-xl">
                 <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3.5 py-1 text-[10px] font-semibold tracking-[0.28em] text-white/90 uppercase backdrop-blur-xl">
-                  <span className="size-1.5 rounded-full bg-amber-400" />
                   Let&apos;s work together
                 </span>
-                <h2 className="mt-5 font-latic text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+                <h2 className="mt-5 font-latic text-3xl font-bold tracking-tight text-white sm:text-4xl">
                   Ready to source the world&apos;s{" "}
                   <span className="bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200 bg-clip-text text-transparent">
                     finest cotton?
@@ -106,9 +105,9 @@ export function SiteFooter() {
             backgroundSize: "26px 26px",
           }}
         />
-        <div className="pointer-events-none absolute -top-32 left-1/2 -z-10 h-80 w-[44rem] max-w-full -translate-x-1/2 rounded-full bg-[var(--royal-glow)]/25 blur-3xl" />
-        <div className="pointer-events-none absolute -right-24 bottom-0 -z-10 size-96 rounded-full bg-amber-400/10 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-24 -left-24 -z-10 size-96 rounded-full bg-[var(--primary)]/30 blur-3xl" />
+        <div className="pointer-events-none absolute -top-32 left-1/2 -z-10 h-80 w-[44rem] max-w-full -translate-x-1/2 rounded-full bg-[var(--royal-glow)]/25 soft-blob" />
+        <div className="pointer-events-none absolute -right-24 bottom-0 -z-10 size-96 rounded-full bg-amber-400/10 soft-blob" />
+        <div className="pointer-events-none absolute -bottom-24 -left-24 -z-10 size-96 rounded-full bg-[var(--primary)]/30 soft-blob" />
         <div
           aria-hidden
           className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-300/60 to-transparent"
@@ -121,7 +120,7 @@ export function SiteFooter() {
               <div className="inline-flex rounded-2xl bg-white/95 px-4 py-2.5 shadow-lg shadow-black/20 ring-1 ring-white/40">
                 <BrandMark />
               </div>
-              <p className="mt-6 max-w-sm text-base leading-relaxed text-white/75">
+              <p className="mt-6 text-base leading-relaxed text-white/75">
                 {COMPANY.tagline}. Connecting the world&apos;s most reputable
                 cotton merchants with Bangladesh&apos;s leading spinning mills.
               </p>
@@ -242,7 +241,7 @@ export function SiteFooter() {
                 © 2026 {COMPANY.name}. All rights
                 reserved.
               </p>
-              <p>
+              <p className="text-center">
                 Designed &amp; developed by{" "}
                 <a
                   href="https://techmindscreativesolutions.com/"

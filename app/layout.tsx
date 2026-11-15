@@ -8,7 +8,15 @@ import { SiteHeader } from "@/components/site-header";
 import "./globals.css";
 
 // next/font self-hosts the fonts (no render-blocking Google request)
-const fraunces = Fraunces({ subsets: ["latin"], style: ["normal", "italic"], variable: "--font-fraunces", display: "swap" });
+// `axes: ["opsz"]` = same as the old `Fraunces:opsz,wght@9..144` link: big headlines get the
+// thin, high-contrast display cut (without it, Next loads only the sturdier text cut)
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  axes: ["opsz"],
+  variable: "--font-fraunces",
+  display: "swap",
+});
 const sora = Sora({ subsets: ["latin"], variable: "--font-sora", display: "swap" });
 const manrope = Manrope({ subsets: ["latin"], variable: "--font-manrope", display: "swap" });
 
@@ -37,6 +45,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     // suppressHydrationWarning: next-themes sets the `dark` class before hydration
     <html lang="en" suppressHydrationWarning className={`${fraunces.variable} ${sora.variable} ${manrope.variable}`}>
       <body className="relative min-h-screen bg-background text-foreground">
+        <noscript>
+          <style>{".eb-reveal{opacity:1!important;transform:none!important}"}</style>
+        </noscript>
         <Providers>
           {/* Ambient background glows */}
           <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">

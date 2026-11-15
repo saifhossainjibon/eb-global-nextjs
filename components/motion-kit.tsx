@@ -1,55 +1,28 @@
 "use client";
-
-/**
- * Animation + shared UI building blocks for the EB Global landing page.
- * Uses the lightweight `m` component (needs <LazyMotion> in providers.tsx).
- * Everything here is theme-aware through CSS variables and `dark:` variants.
- */
-import { useMotionValue, useScroll, useSpring, useTransform } from "motion/react";
-import * as m from "motion/react-m";
-import {
-  useEffect,
-  useId,
-  useRef,
-  useState,
-  useSyncExternalStore,
-  type CSSProperties,
-  type PointerEvent,
-  type ReactNode,
-} from "react";
+import { useEffect, useId, useRef, type CSSProperties, type ElementType, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-const EASE = [0.22, 1, 0.36, 1] as const;
+/* ───────────────────────────── Reveal (CSS + one shared observer) ───────────────────────────── */
 
-/* ───────────────────────────── Hooks ───────────────────────────── */
+let sharedObserver: IntersectionObserver | null = null;
 
-export function useMediaQuery(query: string) {
-  return useSyncExternalStore(
-    (cb) => {
-      const mq = window.matchMedia(query);
-      mq.addEventListener("change", cb);
-      return () => mq.removeEventListener("change", cb);
-    },
-    () => window.matchMedia(query).matches,
-    () => false,
-  );
+function getObserver() {
+  if (!sharedObserver) {
+    sharedObserver = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          // also reveal things we already scrolled past (anchor jumps), so nothing stays hidden
+          if (e.isIntersecting || e.boundingClientRect.top < 0) {
+            e.target.classList.add("is-in");
+            sharedObserver?.unobserve(e.target);
+          }
+        }
+      },
+      { rootMargin: "0px 0px -6% 0px", threshold: 0.01 },
+    );
+  }
+  return sharedObserver;
 }
-
-/* ───────────────────────────── Scroll progress ───────────────────────────── */
-
-export function ScrollProgress() {
-  const { scrollYProgress } = useScroll();
-  const scaleX = useSpring(scrollYProgress, { stiffness: 120, damping: 30, restDelta: 0.001 });
-  return (
-    <m.div
-      aria-hidden
-      style={{ scaleX }}
-      className="fixed inset-x-0 top-0 z-[100] h-[3px] origin-left bg-linear-to-r from-[var(--royal-deep)] via-[var(--primary)] to-[var(--royal-glow)]"
-    />
-  );
-}
-
-/* ───────────────────────────── Reveal ───────────────────────────── */
 
 type RevealProps = {
   children: ReactNode;
@@ -57,152 +30,54 @@ type RevealProps = {
   delay?: number;
   x?: number;
   y?: number;
+  as?: "div" | "li";
+  /** kept for API compatibility with the old version (ignored) */
   scale?: number;
   duration?: number;
-  as?: "div" | "li";
 };
 
-export function Reveal({
-  children,
-  className,
-  delay = 0,
-  x = 0,
-  y = 28,
-  scale = 0.98,
-  duration = 0.8,
-  as = "div",
-}: RevealProps) {
-  const Tag = as === "li" ? m.li : m.div;
+export function Reveal({ children, className, delay = 0, x = 0, y = 16, as = "div" }: RevealProps) {
+  const ref = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = getObserver();
+    io.observe(el);
+    return () => io.unobserve(el);
+  }, []);
+
+  const Tag: ElementType = as;
   return (
     <Tag
-      className={className}
-      initial={{ opacity: 0, x, y, scale }}
-      whileInView={{ opacity: 1, x: 0, y: 0, scale: 1 }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration, delay, ease: EASE }}
+      ref={ref}
+      className={cn("eb-reveal", className)}
+      style={{ "--rx": `${x}px`, "--ry": `${y}px`, transitionDelay: delay ? `${delay}s` : undefined } as CSSProperties}
     >
       {children}
     </Tag>
   );
 }
 
-/* ───────────────────────────── FanIn ───────────────────────────── */
-
+/** Cards in a grid: simple staggered fade-up (no springs, no rotation) */
 export function FanIn({
   index,
-  cols,
   children,
   className,
 }: {
   index: number;
-  cols: number;
+  cols?: number;
   children: ReactNode;
   className?: string;
 }) {
-  const wide = useMediaQuery("(min-width: 1024px)");
-  const mid = (cols - 1) / 2;
-  const col = index % cols;
-
   return (
-    <m.div
-      key={String(wide)}
-      className={className}
-      initial={
-        wide
-          ? { opacity: 0, x: `${(mid - col) * 100}%`, y: 36, rotate: (col - mid) * 8, scale: 0.88 }
-          : { opacity: 0, y: 40 }
-      }
-      whileInView={{ opacity: 1, x: 0, y: 0, rotate: 0, scale: 1 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ type: "spring", stiffness: 110, damping: 17, mass: 0.9, delay: index * 0.09 }}
-    >
+    <Reveal delay={Math.min(index, 4) * 0.06} y={20} className={className}>
       {children}
-    </m.div>
+    </Reveal>
   );
 }
 
-/* ───────────────────────────── Tilt ───────────────────────────── */
-
-export function Tilt({
-  children,
-  className,
-  max = 7,
-}: {
-  children: ReactNode;
-  className?: string;
-  max?: number;
-}) {
-  const canHover = useMediaQuery("(hover: hover) and (pointer: fine)");
-  const px = useMotionValue(0.5);
-  const py = useMotionValue(0.5);
-  const rotateX = useSpring(useTransform(py, [0, 1], [max, -max]), { stiffness: 220, damping: 22 });
-  const rotateY = useSpring(useTransform(px, [0, 1], [-max, max]), { stiffness: 220, damping: 22 });
-
-  const onMove = (e: PointerEvent<HTMLDivElement>) => {
-    if (!canHover) return;
-    const r = e.currentTarget.getBoundingClientRect();
-    px.set((e.clientX - r.left) / r.width);
-    py.set((e.clientY - r.top) / r.height);
-  };
-  const reset = () => {
-    px.set(0.5);
-    py.set(0.5);
-  };
-
-  return (
-    <m.div
-      className={className}
-      style={canHover ? { rotateX, rotateY, transformPerspective: 900 } : {}}
-      onPointerMove={onMove}
-      onPointerLeave={reset}
-    >
-      {children}
-    </m.div>
-  );
-}
-
-/* ───────────────────────────── Magnetic ───────────────────────────── */
-
-export function Magnetic({
-  children,
-  strength = 0.3,
-  className,
-}: {
-  children: ReactNode;
-  strength?: number;
-  className?: string;
-}) {
-  const canHover = useMediaQuery("(hover: hover) and (pointer: fine)");
-  const mx = useMotionValue(0);
-  const my = useMotionValue(0);
-  const x = useSpring(mx, { stiffness: 200, damping: 15, mass: 0.4 });
-  const y = useSpring(my, { stiffness: 200, damping: 15, mass: 0.4 });
-
-  const onMove = (e: PointerEvent<HTMLDivElement>) => {
-    if (!canHover) return;
-    const r = e.currentTarget.getBoundingClientRect();
-    mx.set((e.clientX - (r.left + r.width / 2)) * strength);
-    my.set((e.clientY - (r.top + r.height / 2)) * strength);
-  };
-  const reset = () => {
-    mx.set(0);
-    my.set(0);
-  };
-
-  return (
-    <m.div
-      className={cn("inline-block", className)}
-      style={{ x, y }}
-      onPointerMove={onMove}
-      onPointerLeave={reset}
-    >
-      {children}
-    </m.div>
-  );
-}
-
-/* ───────────────────────────── MaskLine ───────────────────────────── */
-
+/** Headline line that slides up once on load (CSS only) */
 export function MaskLine({
   children,
   delay = 0,
@@ -214,42 +89,34 @@ export function MaskLine({
 }) {
   return (
     <span className="-mx-[0.1em] -my-[0.3em] block overflow-hidden px-[0.1em] py-[0.3em]">
-      <m.span
-        className={cn("block", className)}
-        initial={{ y: "150%" }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.95, delay, ease: EASE }}
-      >
+      <span className={cn("eb-mask block", className)} style={{ "--d": `${delay}s` } as CSSProperties}>
         {children}
-      </m.span>
+      </span>
     </span>
   );
 }
 
-/* ───────────────────────────── CountUp ───────────────────────────── */
+/* ───────────────────────────── CountUp (writes straight to the DOM) ───────────────────────────── */
 
-export function CountUp({
-  value,
-  duration = 1800,
-  delay = 0,
-}: {
-  value: string;
-  duration?: number;
-  delay?: number;
-}) {
+export function CountUp({ value, duration = 1500, delay = 0 }: { value: string; duration?: number; delay?: number }) {
   const match = value.match(/^(\D*)(\d+(?:\.\d+)?)(.*)$/);
   const [, prefix = "", digits = "", suffix = ""] = match ?? [];
   const isNumber = digits !== "";
   const target = isNumber ? parseFloat(digits) : 0;
   const decimals = digits.split(".")[1]?.length ?? 0;
-
   const ref = useRef<HTMLSpanElement>(null);
-  const [n, setN] = useState(0);
 
   useEffect(() => {
-    if (!isNumber || !ref.current) return;
-    let raf = 0;
+    const el = ref.current;
+    if (!isNumber || !el) return;
+    const format = (n: number) => `${prefix}${n.toFixed(decimals)}${suffix}`;
 
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      el.textContent = format(target);
+      return;
+    }
+
+    let raf = 0;
     const io = new IntersectionObserver(
       ([entry]) => {
         if (!entry.isIntersecting) return;
@@ -257,37 +124,66 @@ export function CountUp({
         const start = performance.now() + delay;
         const tick = (now: number) => {
           const p = Math.min(Math.max((now - start) / duration, 0), 1);
-          setN(target * (1 - Math.pow(1 - p, 3)));
+          el.textContent = format(target * (1 - Math.pow(1 - p, 3)));
           if (p < 1) raf = requestAnimationFrame(tick);
         };
         raf = requestAnimationFrame(tick);
       },
       { threshold: 0.4 },
     );
-    io.observe(ref.current);
-
+    io.observe(el);
     return () => {
       io.disconnect();
       cancelAnimationFrame(raf);
     };
-  }, [isNumber, target, duration, delay]);
+  }, [isNumber, prefix, suffix, target, decimals, duration, delay]);
 
   if (!isNumber) return <>{value}</>;
-
   return (
     <span ref={ref} aria-label={value} className="tabular-nums">
-      <span aria-hidden>
-        {prefix}
-        {n.toFixed(decimals)}
-        {suffix}
-      </span>
+      {`${prefix}${(0).toFixed(decimals)}${suffix}`}
     </span>
+  );
+}
+
+/* ───────────────────────────── Scroll progress (one rAF-throttled transform) ───────────────────────────── */
+
+export function ScrollProgress() {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const el = ref.current;
+      if (!el) return;
+      const h = document.documentElement;
+      const max = h.scrollHeight - h.clientHeight;
+      el.style.transform = `scaleX(${max > 0 ? h.scrollTop / max : 0})`;
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      cancelAnimationFrame(raf);
+    };
+  }, []);
+
+  return (
+    <div
+      ref={ref}
+      aria-hidden
+      style={{ transform: "scaleX(0)", willChange: "transform" }}
+      className="fixed inset-x-0 top-0 z-[100] h-[3px] origin-left bg-linear-to-r from-[var(--royal-deep)] via-[var(--primary)] to-[var(--royal-glow)]"
+    />
   );
 }
 
 /* ───────────────────────────── Shared UI ───────────────────────────── */
 
-/** Gradient border used by the dark cards */
 export const GC_WRAP = "bg-linear-to-br from-white/80 via-[var(--royal-glow)] to-[var(--primary)]";
 
 export function Badge({ children, className }: { children: ReactNode; className?: string }) {
@@ -309,7 +205,7 @@ export function Bar({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        "h-1 w-24 rounded-full bg-linear-to-r from-[var(--royal-deep)] via-[var(--primary)] to-[var(--royal-glow)]",
+        "h-1 w-24 rounded-full bg-linear-to-r from-[var(--royal-deep)] via-[var(--primary)] to-[var(--royal-glow)] dark:from-amber-300 dark:via-amber-300/50 dark:to-white/10",
         className,
       )}
     />
@@ -317,8 +213,8 @@ export function Bar({ className }: { className?: string }) {
 }
 
 /**
- * Gradient wash + glowing blobs behind a section.
- * Light: soft pale blobs.  Dark: big blue drifting blobs on black.
+ * Soft glowing blobs behind a section. Static, and drawn with a radial mask
+ * instead of a CSS blur filter (a lot cheaper to paint).
  */
 const BLOB_COLORS = [
   "bg-[var(--royal-glow)]/25 dark:bg-[var(--primary)]/55",
@@ -347,12 +243,7 @@ export function Backdrop({
         <div
           key={b}
           aria-hidden
-          className={cn(
-            "absolute -z-10 rounded-full blur-3xl dark:eb-drift dark:scale-[1.7]",
-            BLOB_COLORS[i % BLOB_COLORS.length],
-            b,
-          )}
-          style={{ animationDelay: `${-i * 5}s` }}
+          className={cn("soft-blob absolute -z-10 rounded-full scale-[1.7]", BLOB_COLORS[i % BLOB_COLORS.length], b)}
         />
       ))}
     </>
@@ -374,18 +265,15 @@ export const LINES_TOP: Line[] = [
 export const LINES_ALL: Line[] = [...LINES_TOP, ...LINES_BOTTOM];
 export const LINES_TEAM: Line[] = LINES_ALL.slice(1);
 
+/** Decorative gradient lines (static) */
 export function FlowingLines({ lines, className }: { lines: Line[]; className?: string }) {
   const id = useId().replace(/:/g, "");
   return (
-    <m.svg
+    <svg
       aria-hidden
       viewBox="0 0 1200 800"
       preserveAspectRatio="none"
       className={cn("pointer-events-none absolute inset-0 h-full w-full", className)}
-      initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
-      viewport={{ once: true }}
-      transition={{ duration: 1.6 }}
     >
       <defs>
         <linearGradient id={id} x1="0" y1="0" x2="1" y2="0">
@@ -394,27 +282,22 @@ export function FlowingLines({ lines, className }: { lines: Line[]; className?: 
           <stop offset="100%" style={{ stopColor: "var(--royal-glow)" }} stopOpacity="0" />
         </linearGradient>
       </defs>
-      <m.g
-        animate={{ x: [-14, 14] }}
-        transition={{ duration: 12, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
-      >
-        {lines.map((l) => (
-          <path
-            key={l.d}
-            d={l.d}
-            fill="none"
-            stroke={`url(#${id})`}
-            strokeWidth="1.5"
-            strokeOpacity={l.o}
-            vectorEffect="non-scaling-stroke"
-          />
-        ))}
-      </m.g>
-    </m.svg>
+      {lines.map((l) => (
+        <path
+          key={l.d}
+          d={l.d}
+          fill="none"
+          stroke={`url(#${id})`}
+          strokeWidth="1.5"
+          strokeOpacity={l.o}
+          vectorEffect="non-scaling-stroke"
+        />
+      ))}
+    </svg>
   );
 }
 
-/** Gradient-border box with top bar + flowing lines */
+/** Gradient-border box with top bar + decorative lines */
 export function GradientFrame({
   id,
   className,
@@ -532,18 +415,10 @@ function Boll({ x, y, s, rot }: { x: number; y: number; s: number; rot: number }
   );
 }
 
-/** Cotton plant that sways gently (a soft blue glow is added automatically in dark mode) */
+/** Static cotton plant (no sway, no filter) */
 export function CottonPlant({ className = "" }: { className?: string }) {
   return (
-    <m.svg
-      aria-hidden
-      viewBox="0 0 420 500"
-      className={cn("dark:opacity-90 dark:drop-shadow-[0_0_30px_rgba(96,165,250,0.35)]", className)}
-      fill="none"
-      style={{ transformOrigin: "15% 100%" }}
-      animate={{ rotate: [0, 1.6, 0, -1.1, 0] }}
-      transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-    >
+    <svg aria-hidden viewBox="0 0 420 500" className={cn("dark:opacity-90", className)} fill="none">
       <g stroke="url(#cf-stem)" strokeWidth="6" strokeLinecap="round">
         <path d="M70,500 C78,420 96,345 150,270" />
         <path d="M150,270 C180,220 210,180 254,140" />
@@ -559,6 +434,6 @@ export function CottonPlant({ className = "" }: { className?: string }) {
       {BOLLS.map((b) => (
         <Boll key={`${b.x}-${b.y}`} {...b} />
       ))}
-    </m.svg>
+    </svg>
   );
 }

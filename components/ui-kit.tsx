@@ -45,6 +45,7 @@ export function LazyVideo({
       muted
       loop
       playsInline
+      disablePictureInPicture
       autoPlay={eager}
       preload={eager ? "auto" : "metadata"}
       poster={poster}
@@ -135,9 +136,10 @@ export function DarkCard({
   return (
     <div
       className={cn(
-        "group eb-pad shadow-lg shadow-[var(--royal-deep)]/20 transition-all duration-300 motion-reduce:transition-none motion-reduce:hover:translate-y-0 dark:shadow-[#0b1a4a]/40",
+        "group eb-pad shadow-lg shadow-[var(--royal-deep)]/20 transition-transform duration-300 motion-reduce:transition-none motion-reduce:hover:translate-y-0 dark:shadow-[#0b1a4a]/40",
         always ? GC_WRAP : "eb-frame",
-        hover,
+        // hover = movement only: animating box-shadow forces a repaint every frame
+        hover.split(" ").filter((c) => !c.includes("shadow")).join(" "),
         className,
       )}
       style={{ "--r": radius, "--p": pad, "--pd": darkPad ?? pad, borderRadius: radius } as CSSProperties}
@@ -247,7 +249,7 @@ export function SectionHead({
   return (
     <div className={cn(center && "text-center", className)}>
       <Badge>{badge}</Badge>
-      <h2 className={cn(    "mt-6 font-display font-extrabold tracking-tight text-foreground leading-[32.3]", titleClass)}>{title}</h2>
+      <h2 className={cn("mt-6 font-display font-extrabold tracking-tight text-foreground", titleClass)}>{title}</h2>
       <Bar className={cn("mt-6", center && "mx-auto")} />
       {children}
     </div>
