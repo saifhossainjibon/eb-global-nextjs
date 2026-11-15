@@ -137,7 +137,7 @@ function Hero() {
       <div className="relative mx-auto w-full max-w-5xl">
         <div className="mx-auto max-w-5xl text-center">
           <Reveal delay={0.1} y={20}>
-            <p className="mt-4 inline-flex items-center gap-2.5 rounded-full border border-white/30 bg-white/20 px-4 py-1.5 text-[11px] font-extrabold tracking-[0.3em] text-white uppercase shadow-lg shadow-black/20 backdrop-blur-md">
+            <p className="mt-10 inline-flex items-center gap-2.5 rounded-full border border-white/30 bg-white/20 px-4 py-1.5 text-[11px] font-extrabold tracking-[0.3em] text-white uppercase shadow-lg shadow-black/20 backdrop-blur-md">
               Cotton Indenting &amp; Sourcing
             </p>
           </Reveal>
