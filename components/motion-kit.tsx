@@ -11,7 +11,6 @@ function getObserver() {
     sharedObserver = new IntersectionObserver(
       (entries) => {
         for (const e of entries) {
-          // also reveal things we already scrolled past (anchor jumps), so nothing stays hidden
           if (e.isIntersecting || e.boundingClientRect.top < 0) {
             e.target.classList.add("is-in");
             sharedObserver?.unobserve(e.target);
@@ -31,31 +30,84 @@ type RevealProps = {
   x?: number;
   y?: number;
   as?: "div" | "li";
-  /** kept for API compatibility with the old version (ignored) */
   scale?: number;
   duration?: number;
 };
 
-export function Reveal({ children, className, delay = 0, x = 0, y = 16, as = "div" }: RevealProps) {
-  const ref = useRef<HTMLElement>(null);
+// export function Reveal({ children, className, delay = 0, x = 0, y = 16, as = "div" }: RevealProps) {
+//   const ref = useRef<HTMLElement>(null);
+
+//   useEffect(() => {
+//     const el = ref.current;
+//     if (!el) return;
+//     const io = getObserver();
+//     io.observe(el);
+//     return () => io.unobserve(el);
+//   }, []);
+
+//   const Tag: ElementType = as;
+//   return (
+//     <Tag
+//       ref={ref}
+//       className={cn("eb-reveal", className)}
+//       style={{ "--rx": `${x}px`, "--ry": `${y}px`, transitionDelay: delay ? `${delay}s` : undefined } as CSSProperties}
+//     >
+//       {children}
+//     </Tag>
+//   );
+// }
+
+export function Reveal({
+  children,
+  className,
+  delay = 0,
+  x = 0,
+  y = 16,
+  as = "div",
+}: RevealProps) {
+  const ref = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+
     const io = getObserver();
     io.observe(el);
+
     return () => io.unobserve(el);
   }, []);
 
-  const Tag: ElementType = as;
+  const commonProps = {
+    className: cn("eb-reveal", className),
+    style: {
+      "--rx": `${x}px`,
+      "--ry": `${y}px`,
+      transitionDelay: delay ? `${delay}s` : undefined,
+    } as CSSProperties,
+  };
+
+  if (as === "li") {
+    return (
+      <li
+        ref={(node) => {
+          ref.current = node;
+        }}
+        {...commonProps}
+      >
+        {children}
+      </li>
+    );
+  }
+
   return (
-    <Tag
-      ref={ref}
-      className={cn("eb-reveal", className)}
-      style={{ "--rx": `${x}px`, "--ry": `${y}px`, transitionDelay: delay ? `${delay}s` : undefined } as CSSProperties}
+    <div
+      ref={(node) => {
+        ref.current = node;
+      }}
+      {...commonProps}
     >
       {children}
-    </Tag>
+    </div>
   );
 }
 
