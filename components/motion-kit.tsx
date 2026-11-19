@@ -111,6 +111,72 @@ export function Reveal({
   );
 }
 
+
+// export function Reveal({
+//   children,
+//   className,
+//   delay = 0,
+//   x = 0,
+//   y = 16,
+//   as = "div",
+// }: RevealProps) {
+//   const ref = useRef<HTMLElement | null>(null);
+
+//   useEffect(() => {
+//     const el = ref.current;
+//     if (!el) return;
+
+//     // If the element is already in view at mount (common on desktop),
+//     // don't animate — just show it. Otherwise observe it.
+//     const rect = el.getBoundingClientRect();
+//     const alreadyVisible =
+//       rect.top < window.innerHeight && rect.bottom > 0;
+
+//     if (alreadyVisible) {
+//       el.classList.add("is-in");
+//       return;
+//     }
+
+//     const io = getObserver();
+//     io.observe(el);
+//     return () => io.unobserve(el);
+//   }, []);
+
+
+//   const commonProps = {
+//     className: cn("eb-reveal", className),
+//     style: {
+//       "--rx": `${x}px`,
+//       "--ry": `${y}px`,
+//       transitionDelay: delay ? `${delay}s` : undefined,
+//     } as CSSProperties,
+//   };
+
+//   if (as === "li") {
+//     return (
+//       <li
+//         ref={(node) => {
+//           ref.current = node;
+//         }}
+//         {...commonProps}
+//       >
+//         {children}
+//       </li>
+//     );
+//   }
+
+//   return (
+//     <div
+//       ref={(node) => {
+//         ref.current = node;
+//       }}
+//       {...commonProps}
+//     >
+//       {children}
+//     </div>
+//   );
+// }
+
 /** Cards in a grid: simple staggered fade-up (no springs, no rotation) */
 export function FanIn({
   index,

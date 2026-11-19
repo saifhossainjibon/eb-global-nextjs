@@ -11,17 +11,17 @@ export const COMPANY = {
 
 
 import BCA from "@/assets/membership/BCA.webp";
-import ICA from "@/assets/membership/ICA.webp";
+// import ICA from "@/assets/membership/ICA.webp";
 import BIAA from "@/assets/membership/BIAA.webp";
 
 export type Buyer = { name: string; logo: string };
 export const MEMBERSHIPS = [
-  {
-    abbr: "ICA",
-    name: "International Cotton Association",
-    desc: "As an active ICA member, we trade under globally recognized contracts ensuring fair dealing and dispute resolution.",
-    logo: ICA,
-  },
+  // {
+  //   abbr: "ICA",
+  //   name: "International Cotton Association",
+  //   desc: "As an active ICA member, we trade under globally recognized contracts ensuring fair dealing and dispute resolution.",
+  //   logo: ICA,
+  // },
   {
     abbr: "BCA",
     name: "Bangladesh Cotton Association",
