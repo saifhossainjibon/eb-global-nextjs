@@ -920,7 +920,7 @@ function MembershipsContact() {
                   className="shadow-2xl shadow-[var(--royal-deep)]/30 dark:shadow-[#0b1a4a]/60"
                   line="via-white/0"
                 >
-                  <ul className="relative grid divide-y divide-white/10 md:grid-cols-3 md:divide-x md:divide-y-0">
+                  <ul className="relative grid divide-y divide-white/10 md:grid-cols-2 md:divide-x md:divide-y-0">
                     <div className="aurora-blob pointer-events-none top-0 left-1/2 size-96 -translate-x-1/2 bg-[var(--royal-glow)]/20" />
                     {MEMBERSHIPS.map((mem) => (
                       <li
